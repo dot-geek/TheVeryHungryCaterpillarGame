@@ -33,7 +33,7 @@
                     android:layout_weight="1">
                     <TextView
                         android:id="@+id/textView_score"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:padding="8dp"
                         android:text="@string/score_title"
                         android:textColor="@color/colorPrimaryDark"
@@ -48,7 +48,7 @@
                     android:layout_weight="1">
                     <TextView
                         android:id="@+id/textView_level"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:padding="8dp"
                         android:text="@string/level_title"
                         android:textColor="@color/colorPrimaryDark"

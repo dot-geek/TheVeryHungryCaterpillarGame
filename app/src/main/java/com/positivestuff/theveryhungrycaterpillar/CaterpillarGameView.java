@@ -33,10 +33,15 @@ public class CaterpillarGameView extends PixelView {
     public static final int DIRECTION_RIGHT = 3;
     public static final int DIRECTION_LEFT = 4;
 
-    public static final int PIXEL_BORDER = 1;
-    public static final int PIXEL_FOOD = 2;
-    public static final int PIXEL_CATERPILLAR_HEAD = 3;
-    public static final int PIXEL_CATERPILLAR_BODY = 4;
+    public static final int PIXEL_FOOD = 1;
+    public static final int PIXEL_CATERPILLAR_HEAD = 2;
+    public static final int PIXEL_CATERPILLAR_BODY = 3;
+    public static final int PIXEL_BORDER_1 = 4;
+    public static final int PIXEL_BORDER_2 = 5;
+    public static final int PIXEL_BORDER_3 = 6;
+    public static final int PIXEL_BORDER_4 = 7;
+    public static final int PIXEL_BORDER_5 = 8;
+    public static final int PIXEL_TYPE_COUNT = 9;
 
     public long mScore = 0;
     public long mLevel = 0;
@@ -83,11 +88,17 @@ public class CaterpillarGameView extends PixelView {
 
         Resources r = this.getContext().getResources();
 
-        resetPixels(5);
-        loadPixel(PIXEL_BORDER, r.getDrawable(R.drawable.pixel_green, getContext().getTheme()));
-        loadPixel(PIXEL_FOOD, r.getDrawable(R.drawable.pixel_yellow, getContext().getTheme()));
-        loadPixel(PIXEL_CATERPILLAR_HEAD, r.getDrawable(R.drawable.circle_red, getContext().getTheme()));
-        loadPixel(PIXEL_CATERPILLAR_BODY, r.getDrawable(R.drawable.circle_dark_green, getContext().getTheme()));
+        resetPixels(PIXEL_TYPE_COUNT);
+
+        loadPixel(PIXEL_FOOD, r.getDrawable(R.drawable.pixel_square_yellow, getContext().getTheme()));
+        loadPixel(PIXEL_CATERPILLAR_HEAD, r.getDrawable(R.drawable.pixel_round_red, getContext().getTheme()));
+        loadPixel(PIXEL_CATERPILLAR_BODY, r.getDrawable(R.drawable.pixel_round_dark_green, getContext().getTheme()));
+
+        loadPixel(PIXEL_BORDER_1, r.getDrawable(R.drawable.pixel_round_pink, getContext().getTheme()));
+        loadPixel(PIXEL_BORDER_2, r.getDrawable(R.drawable.pixel_round_orange, getContext().getTheme()));
+        loadPixel(PIXEL_BORDER_3, r.getDrawable(R.drawable.pixel_round_yellow, getContext().getTheme()));
+        loadPixel(PIXEL_BORDER_4, r.getDrawable(R.drawable.pixel_round_light_green, getContext().getTheme()));
+        loadPixel(PIXEL_BORDER_5, r.getDrawable(R.drawable.pixel_round_blue, getContext().getTheme()));
     }
 
     public void initNewGame() {
@@ -102,6 +113,7 @@ public class CaterpillarGameView extends PixelView {
         mCaterpillarBody.add(new Coordinate(15, 20));
         mNextDirection = DIRECTION_UP;
 
+        addRandomFood();
         addRandomFood();
 
         // TODO: For testing
@@ -249,13 +261,84 @@ public class CaterpillarGameView extends PixelView {
     }
 
     private void updateBorder() {
-        for (int x = 0; x < mXPixelCount; x++) {
-            setPixel(PIXEL_BORDER, x, 0);
-            setPixel(PIXEL_BORDER, x, mYPixelCount - 1);
+        int x = 4;
+        for (; x < mXPixelCount; x+=5) {
+            // Top Border
+            setPixel(PIXEL_BORDER_1, x-4, 0);
+            setPixel(PIXEL_BORDER_2, x-3, 0);
+            setPixel(PIXEL_BORDER_3, x-2, 0);
+            setPixel(PIXEL_BORDER_4, x-1, 0);
+            setPixel(PIXEL_BORDER_5, x, 0);
+            // Bottom Border
+            setPixel(PIXEL_BORDER_5, x-4, mYPixelCount - 1);
+            setPixel(PIXEL_BORDER_4, x-3, mYPixelCount - 1);
+            setPixel(PIXEL_BORDER_3, x-2, mYPixelCount - 1);
+            setPixel(PIXEL_BORDER_2, x-1, mYPixelCount - 1);
+            setPixel(PIXEL_BORDER_1, x, mYPixelCount - 1);
         }
-        for (int y = 1; y < mYPixelCount - 1; y++) {
-            setPixel(PIXEL_BORDER, 0, y);
-            setPixel(PIXEL_BORDER, mXPixelCount - 1, y);
+        // Sort out any leftover pixels that were not filled
+        x-=5;
+        int diff = mXPixelCount - x;
+        if (diff > 0) {
+            if (diff >= 1) {
+                setPixel(PIXEL_BORDER_5, x, 0);
+                setPixel(PIXEL_BORDER_1, x, mYPixelCount - 1);
+            }
+            x++;
+            if (diff >= 2) {
+                setPixel(PIXEL_BORDER_4, x, 0);
+                setPixel(PIXEL_BORDER_2, x, mYPixelCount - 1);
+            }
+            x++;
+            if (diff >= 3) {
+                setPixel(PIXEL_BORDER_3, x, 0);
+                setPixel(PIXEL_BORDER_3, x, mYPixelCount - 1);
+            }
+            x++;
+            if (diff >= 4) {
+                setPixel(PIXEL_BORDER_2, x, 0);
+                setPixel(PIXEL_BORDER_4, x, mYPixelCount - 1);
+            }
+        }
+
+        int y = 5; // Starts at pixel 1 not 0
+        for (; y < mYPixelCount - 1; y+=5) {
+            // Left Border
+            setPixel(PIXEL_BORDER_5, 0, y-4);
+            setPixel(PIXEL_BORDER_4, 0, y-3);
+            setPixel(PIXEL_BORDER_3, 0, y-2);
+            setPixel(PIXEL_BORDER_2, 0, y-1);
+            setPixel(PIXEL_BORDER_1, 0, y);
+            // Right Border
+            setPixel(PIXEL_BORDER_1, mXPixelCount - 1, y-4);
+            setPixel(PIXEL_BORDER_2, mXPixelCount - 1, y-3);
+            setPixel(PIXEL_BORDER_3, mXPixelCount - 1, y-2);
+            setPixel(PIXEL_BORDER_4, mXPixelCount - 1, y-1);
+            setPixel(PIXEL_BORDER_5, mXPixelCount - 1, y);
+        }
+        // Sort out any leftover pixels that were not filled
+        y-=5;
+        diff = mYPixelCount - 1 - y;
+        if (diff > 0) {
+            if (diff >= 1) {
+                setPixel(PIXEL_BORDER_1, 0, y);
+                setPixel(PIXEL_BORDER_5, mXPixelCount - 1, y);
+            }
+            y++;
+            if (diff >= 2) {
+                setPixel(PIXEL_BORDER_2, 0, y);
+                setPixel(PIXEL_BORDER_4, mXPixelCount - 1, y);
+            }
+            y++;
+            if (diff >= 3) {
+                setPixel(PIXEL_BORDER_3, 0, y);
+                setPixel(PIXEL_BORDER_3, mXPixelCount - 1, y);
+            }
+            y++;
+            if (diff >= 4) {
+                setPixel(PIXEL_BORDER_4, 0, y);
+                setPixel(PIXEL_BORDER_2, mXPixelCount - 1, y);
+            }
         }
     }
 
@@ -308,13 +391,13 @@ public class CaterpillarGameView extends PixelView {
             }
         }
 
-
+        // Check if caterpillar hit the border
         if ((newHead.x < 1) || (newHead.y < 1) || (newHead.x > mXPixelCount - 2) || (newHead.y > mYPixelCount - 2)) {
             setMode(MODE_LOST);
             return;
-
         }
 
+        // Check if the caterpillar hit itself
         int caterpillarlength = mCaterpillarBody.size();
         for (int caterpillarindex = 0; caterpillarindex < caterpillarlength; caterpillarindex++) {
             Coordinate c = mCaterpillarBody.get(caterpillarindex);
@@ -324,6 +407,7 @@ public class CaterpillarGameView extends PixelView {
             }
         }
 
+        // Check if it hit the food
         int foodcount = mFoodList.size();
         for (int foodindex = 0; foodindex < foodcount; foodindex++) {
             Coordinate c = mFoodList.get(foodindex);
@@ -342,8 +426,10 @@ public class CaterpillarGameView extends PixelView {
             }
         }
 
+        // Update new head coordinate
         mCaterpillarBody.add(0, newHead);
         if (!growCaterpillar) {
+            // Caterpillar is not growing, remove last pixel
             mCaterpillarBody.remove(mCaterpillarBody.size() - 1);
         }
 
